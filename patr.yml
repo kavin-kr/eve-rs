@@ -1,0 +1,18 @@
+version: v1
+kind: Pipeline
+name: test-pipeline
+steps:
+  - name: cargo-build
+    image: "rust:1"
+    commands:
+      - cargo build
+  - name: cargo-clippy
+    image: "rust:1"
+    commands:
+      - rustup component add clippy
+      - cargo clippy
+  - name: cargo-clippy
+    image: "rust:1"
+    commands:
+      - rustup component add rustfmt
+      - cargo fmt -v
