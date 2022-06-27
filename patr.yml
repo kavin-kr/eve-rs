@@ -16,3 +16,13 @@ steps:
     commands:
       - rustup component add rustfmt
       - cargo fmt -v
+  - name: echo-var
+    image: alpine/git
+    env:
+      - name: var1
+        value: hello
+      - name: var2
+        value: world
+    commands:
+      - echo $var1 $var2
+  
