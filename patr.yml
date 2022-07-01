@@ -25,4 +25,3 @@ steps:
         value: world
     commands:
       - echo $var1 $var2
-  
