@@ -16,7 +16,6 @@ steps:
     commands:
       - rustup component add rustfmt
       - cargo fmt -v
-      - exit 1
   - name: echo-var
     image: alpine/git
     env:
