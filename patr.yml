@@ -15,14 +15,14 @@ steps:
       - name: PGHOST
         value: db1
       - name: PGPORT
-        value: 5432
+        value: "5432"
       - name: PGDATABASE
         value: postgres
       - name: PGUSER
         value: postgres
       - name: PGPASSWORD
         value: postgres_password1
-    command: |
+    commands: |
       apk add postgresql-client
       # try 5 times with 2 sec interval
       for i in {1..5}
@@ -41,14 +41,14 @@ steps:
       - name: PGHOST
         value: db1
       - name: PGPORT
-        value: 5432
+        value: "5432"
       - name: PGDATABASE
         value: postgres
       - name: PGUSER
         value: postgres
       - name: PGPASSWORD
         value: postgres_password1
-    command: |
+    commands: |
       apk add postgresql-client
       psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
       psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
@@ -71,13 +71,13 @@ steps:
       - name: PGHOST
         value: db1
       - name: PGPORT
-        value: 5432
+        value: "5432"
       - name: PGDATABASE
         value: postgres
       - name: PGUSER
         value: postgres
       - name: PGPASSWORD
         value: postgres_password1
-    command: |
+    commands: |
       apk add postgresql-client
       psql -c "SELECT * from temp;"
