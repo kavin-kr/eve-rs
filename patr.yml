@@ -1,27 +1,83 @@
-version: v1
 kind: Pipeline
+version: v1
 name: test-pipeline
+services:
+  - name: db1
+    image: postgres
+    env: 
+      - name: POSTGRES_PASSWORD
+        value: postgres_password1
+    port: 5432
 steps:
+  - name: check-postgres
+    image: alpine
+    env: 
+      - name: PGHOST
+        value: db1
+      - name: PGPORT
+        value: 5432
+      - name: PGDATABASE
+        value: postgres
+      - name: PGUSER
+        value: postgres
+      - name: PGPASSWORD
+        value: postgres_password1
+    command: |
+      apk add postgresql-client
+      # try 5 times with 2 sec interval
+      for i in {1..5}
+      do
+      if [ pg_isready ]; then
+        echo 'pg alive';
+        exit 0;
+      fi  
+        sleep 2;
+      done
+      echo 'pg not alive';
+      exit 1;
+  - name: postgres-insert-values
+    image: alpine
+    env: 
+      - name: PGHOST
+        value: db1
+      - name: PGPORT
+        value: 5432
+      - name: PGDATABASE
+        value: postgres
+      - name: PGUSER
+        value: postgres
+      - name: PGPASSWORD
+        value: postgres_password1
+    command: |
+      apk add postgresql-client
+      psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
+      psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
   - name: cargo-build
     image: "rust:1"
-    commands:
-      - cargo build
+    commands: cargo build
   - name: cargo-clippy
     image: "rust:1"
     commands:
       - rustup component add clippy
       - cargo clippy
-  - name: cargo-fmt
+  - name: cargo-clippy
     image: "rust:1"
-    commands:
-      - rustup component add rustfmt
-      - cargo fmt -v
-  - name: echo-var
-    image: alpine/git
-    env:
-      - name: var1
-        value: hello
-      - name: var2
-        value: world
-    commands:
-      - echo $var1 $var2
+    commands: |
+      rustup component add rustfmt
+      cargo fmt -v
+  - name: postgres-select-values
+    image: alpine
+    env: 
+      - name: PGHOST
+        value: db1
+      - name: PGPORT
+        value: 5432
+      - name: PGDATABASE
+        value: postgres
+      - name: PGUSER
+        value: postgres
+      - name: PGPASSWORD
+        value: postgres_password1
+    command: |
+      apk add postgresql-client
+      psql -c "SELECT * from temp;"
