@@ -81,4 +81,3 @@ steps:
     commands: |
       apk add postgresql-client
       psql -c "SELECT * from temp;"
-
