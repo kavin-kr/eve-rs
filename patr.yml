@@ -60,7 +60,7 @@ steps:
     commands:
       - rustup component add clippy
       - cargo clippy
-  - name: cargo-clippy
+  - name: cargo-fmt
     image: "rust:1"
     commands: |
       rustup component add rustfmt
