@@ -6,7 +6,7 @@ services:
     image: postgres
     env: 
       - name: POSTGRES_PASSWORD
-        value: postgres_password1
+        value_from_secret: postgres_pass
     port: 5432
 steps:
   - name: check-postgres
@@ -20,10 +20,11 @@ steps:
         value: postgres
       - name: PGUSER
         value: postgres
-      - name: PGPASSWORD
-        value: postgres_password1
+      - name: POSTGRES_PASSWORD
+        value_from_secret: postgres_pas
     commands: |
       apk add postgresql-client
+      echo $POSTGRES_PASSWORD
       # try 5 times with 2 sec interval
       for i in {1..5}
       do
@@ -46,8 +47,8 @@ steps:
         value: postgres
       - name: PGUSER
         value: postgres
-      - name: PGPASSWORD
-        value: postgres_password1
+      - name: POSTGRES_PASSWORD
+        value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
       psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
@@ -76,8 +77,8 @@ steps:
         value: postgres
       - name: PGUSER
         value: postgres
-      - name: PGPASSWORD
-        value: postgres_password1
+      - name: POSTGRES_PASSWORD
+        value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
       psql -c "SELECT * from temp;"
