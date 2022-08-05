@@ -53,6 +53,7 @@ steps:
         value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
+      echo $POSTGRES_PASSWORD
       psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
       psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
   - name: cargo-build
@@ -83,4 +84,5 @@ steps:
         value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
+      echo $POSTGRES_PASSWORD
       psql -c "SELECT * from temp;"
