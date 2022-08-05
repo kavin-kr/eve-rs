@@ -8,6 +8,8 @@ services:
       - name: POSTGRES_PASSWORD
         value_from_secret: postgres_pass
     port: 5432
+    commands: |
+      postgres
 steps:
   - name: check-postgres
     image: alpine
@@ -82,3 +84,4 @@ steps:
     commands: |
       apk add postgresql-client
       psql -c "SELECT * from temp;"
+      
