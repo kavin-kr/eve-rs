@@ -5,7 +5,7 @@ services:
   - name: db1
     image: postgres:alpine
     env: 
-      - name: PGPASSWORD
+      - name: POSTGRES_PASSWORD
         value_from_secret: postgres_pass
     port: 5432
     commands: |
