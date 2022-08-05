@@ -3,13 +3,13 @@ version: v1
 name: test-pipeline
 services:
   - name: db1
-    image: postgres
+    image: postgres:alpine
     env: 
       - name: POSTGRES_PASSWORD
         value_from_secret: postgres_pass
     port: 5432
     commands: |
-      postgres
+      docker-entrypoint.sh -c 'shared_buffers=256MB' -c 'max_connections=200'
 steps:
   - name: check-postgres
     image: alpine
