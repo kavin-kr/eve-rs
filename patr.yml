@@ -5,7 +5,7 @@ services:
   - name: db1
     image: postgres:alpine
     env: 
-      - name: POSTGRES_PASSWORD
+      - name: PGPASSWORD
         value_from_secret: postgres_pass
     port: 5432
     commands: |
@@ -22,11 +22,10 @@ steps:
         value: postgres
       - name: PGUSER
         value: postgres
-      - name: POSTGRES_PASSWORD
+      - name: PGPASSWORD
         value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
-      echo $POSTGRES_PASSWORD
       # try 5 times with 2 sec interval
       for i in {1..5}
       do
@@ -49,13 +48,12 @@ steps:
         value: postgres
       - name: PGUSER
         value: postgres
-      - name: POSTGRES_PASSWORD
+      - name: PGPASSWORD
         value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
-      echo $POSTGRES_PASSWORD
-      psql -W $POSTGRES_PASSWORD -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
-      psql -W $POSTGRES_PASSWORD -c "INSERT INTO temp(id_val) values (1), (2), (3);"
+      psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
+      psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
   - name: cargo-build
     image: "rust:1"
     commands: cargo build
@@ -80,9 +78,8 @@ steps:
         value: postgres
       - name: PGUSER
         value: postgres
-      - name: POSTGRES_PASSWORD
+      - name: PGPASSWORD
         value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
-      echo $POSTGRES_PASSWORD
-      psql -W $POSTGRES_PASSWORD -c "SELECT * from temp;"
+      psql -c "SELECT * from temp;"
