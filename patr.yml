@@ -21,7 +21,7 @@ steps:
       - name: PGUSER
         value: postgres
       - name: POSTGRES_PASSWORD
-        value_from_secret: postgres_pas
+        value_from_secret: postgres_pass
     commands: |
       apk add postgresql-client
       echo $POSTGRES_PASSWORD
