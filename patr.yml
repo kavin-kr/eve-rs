@@ -4,27 +4,22 @@ name: test-pipeline
 services:
   - name: db1
     image: postgres:alpine
-    env: 
-      - name: POSTGRES_PASSWORD
-        value_from_secret: postgres_pass
+    env:
+      POSTGRES_PASSWORD:
+        from_secret: postgres_pass
     port: 5432
-    commands: |
-      docker-entrypoint.sh -c 'shared_buffers=256MB' -c 'max_connections=200'
+    command: docker-entrypoint.sh -c 'shared_buffers=256MB' -c 'max_connections=200'
 steps:
   - name: check-postgres
     image: alpine
-    env: 
-      - name: PGHOST
-        value: db1
-      - name: PGPORT
-        value: "5432"
-      - name: PGDATABASE
-        value: postgres
-      - name: PGUSER
-        value: postgres
-      - name: PGPASSWORD
-        value_from_secret: postgres_pass
-    commands: |
+    env:
+      PGHOST: db1
+      PGPORT: "5432"
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD:
+        from_secret: postgres_pass
+    command: |
       apk add postgresql-client
       # try 5 times with 2 sec interval
       for i in {1..5}
@@ -32,54 +27,51 @@ steps:
       if [ pg_isready ]; then
         echo 'pg alive';
         exit 0;
-      fi  
+      fi
         sleep 2;
       done
       echo 'pg not alive';
       exit 1;
+
   - name: postgres-insert-values
     image: alpine
-    env: 
-      - name: PGHOST
-        value: db1
-      - name: PGPORT
-        value: "5432"
-      - name: PGDATABASE
-        value: postgres
-      - name: PGUSER
-        value: postgres
-      - name: PGPASSWORD
-        value_from_secret: postgres_pass
-    commands: |
+    env:
+      PGHOST: db1
+      PGPORT: "5432"
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD:
+        from_secret: postgres_pass
+    command: |
       apk add postgresql-client
       psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
       psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
+
   - name: cargo-build
     image: "rust:1"
-    commands: cargo build
+    command: cargo build
+
   - name: cargo-clippy
     image: "rust:1"
-    commands:
+    command:
       - rustup component add clippy
       - cargo clippy
+
   - name: cargo-fmt
     image: "rust:1"
-    commands: |
-      rustup component add rustfmt
-      cargo fmt -v
+    command:
+      - rustup component add rustfmt
+      - cargo fmt -v
+
   - name: postgres-select-values
     image: alpine
-    env: 
-      - name: PGHOST
-        value: db1
-      - name: PGPORT
-        value: "5432"
-      - name: PGDATABASE
-        value: postgres
-      - name: PGUSER
-        value: postgres
-      - name: PGPASSWORD
-        value_from_secret: postgres_pass
-    commands: |
+    env:
+      PGHOST: db1
+      PGPORT: "5432"
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD:
+        from_secret: postgres_pass
+    command: |
       apk add postgresql-client
       psql -c "SELECT * from temp;"
