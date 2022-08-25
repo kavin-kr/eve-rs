@@ -9,44 +9,7 @@ services:
         from_secret: postgres_pass
     port: 5432
     command: docker-entrypoint.sh -c 'shared_buffers=256MB' -c 'max_connections=200'
-steps:
-  - name: check-postgres
-    image: alpine
-    env:
-      PGHOST: db1
-      PGPORT: "5432"
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD:
-        from_secret: postgres_pass
-    command: |
-      apk add postgresql-client
-      # try 5 times with 2 sec interval
-      for i in {1..5}
-      do
-      if [ pg_isready ]; then
-        echo 'pg alive';
-        exit 0;
-      fi
-        sleep 2;
-      done
-      echo 'pg not alive';
-      exit 1;
-
-  - name: postgres-insert-values
-    image: alpine
-    env:
-      PGHOST: db1
-      PGPORT: "5432"
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD:
-        from_secret: postgres_pass
-    command: |
-      apk add postgresql-client
-      psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
-      psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
-    
+steps:    
   - name: skip-build-if-not-master
     when:
       branch:
@@ -70,16 +33,3 @@ steps:
     command:
       - rustup component add rustfmt
       - cargo fmt -v
-
-  - name: postgres-select-values
-    image: alpine
-    env:
-      PGHOST: db1
-      PGPORT: "5432"
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD:
-        from_secret: postgres_pass
-    command: |
-      apk add postgresql-client
-      psql -c "SELECT * from temp;"
