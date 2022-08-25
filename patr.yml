@@ -46,6 +46,14 @@ steps:
       apk add postgresql-client
       psql -c "CREATE TABLE temp(id SERIAL PRIMARY KEY, id_val INT);"
       psql -c "INSERT INTO temp(id_val) values (1), (2), (3);"
+    
+  - name: skip-build-if-not-master
+    when:
+      branch:
+        - master
+        - feature/*
+    then: cargo-build
+    else: cargo-clippy
 
   - name: cargo-build
     image: "rust:1"
